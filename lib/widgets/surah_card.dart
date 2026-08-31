@@ -63,7 +63,7 @@ class SurahCard extends StatelessWidget {
             textDirection: TextDirection.rtl,
             children: [
               // سمت راست: شماره سوره در کادر اسلیمی ستاره‌ای
-              // Right: Surah number in Islamic star badge
+              // Right: Surah number in Islamic circle badge
               Container(
                 width: 50,
                 height: 50,
@@ -85,6 +85,7 @@ class SurahCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                   ),
                 ),
@@ -115,6 +116,8 @@ class SurahCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: AppColors.textDark,
                           ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     // محل نزول و تعداد آیات
