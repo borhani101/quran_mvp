@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Theme Data for Quran MVP Application
 class AppTheme {
@@ -38,12 +38,12 @@ class AppTheme {
         centerTitle: true,
         titleTextStyle: const TextStyle(
           color: Colors.white,
-          fontSize: 18,
+          fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
       ),
       
-      // Text Theme - فونت‌های مناسب
+      // Text Theme
       textTheme: TextTheme(
         displayLarge: TextStyle(
           fontSize: 32,
@@ -95,40 +95,36 @@ class AppTheme {
       // Card Theme
       cardTheme: CardTheme(
         color: AppColors.cardBg,
-        elevation: 2,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: AppColors.dividerColor,
-            width: 0.5,
-          ),
+          borderRadius: BorderRadius.circular(0),
         ),
       ),
       
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.bgLight,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(
             color: AppColors.dividerColor,
-            width: 1,
+            width: 0,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(
             color: AppColors.dividerColor,
-            width: 1,
+            width: 0,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(
             color: AppColors.primaryDark,
-            width: 2,
+            width: 1,
           ),
         ),
         hintStyle: TextStyle(
@@ -168,7 +164,7 @@ class AppTheme {
       
       // BottomNavigationBar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.cardBg,
+        backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textGrey,
         elevation: 8,
@@ -182,7 +178,6 @@ class AppTheme {
         space: 0,
       ),
       
-      // Other
       useMaterial3: true,
     );
   }
