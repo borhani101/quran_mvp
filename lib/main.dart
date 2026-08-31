@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const QuranApp());
@@ -16,11 +17,7 @@ class QuranApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'قرآن MVP',
-        theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.teal,
-          // متن پیش‌فرض راست به چپ، فونت‌های پیش‌فرض سیستم استفاده می‌شود
-        ),
+        theme: AppTheme.lightTheme,
         home: const HomeScreen(),
         // locale: const Locale('fa'), // می‌توانید فعال کنید در صورت نیاز
       ),
