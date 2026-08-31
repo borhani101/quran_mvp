@@ -98,7 +98,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
               ),
             ),
 
-            // Surah List
+            // Surah List - استفاده از SurahListItem
             Expanded(
               child: _filteredSurahs.isEmpty
                   ? Center(
@@ -114,6 +114,8 @@ class _SurahListScreenState extends State<SurahListScreen> {
                       separatorBuilder: (_, __) => const Divider(
                         height: 1,
                         thickness: 0.5,
+                        indent: 0,
+                        endIndent: 0,
                       ),
                       itemBuilder: (context, index) {
                         final surah = _filteredSurahs[index];
