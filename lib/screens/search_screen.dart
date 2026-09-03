@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import '../models/surah.dart';
+import '../models/ayah.dart';
 import '../services/quran_service.dart';
-import '../widgets/ayah_tile.dart';
+import '../theme/app_colors.dart';
 import 'surah_detail_screen.dart';
 
-// صفحه جستجو
+class SearchResultItem {
+  final Surah surah;
+  final Ayah ayah;
+  final int ayahIndex;
+
+  SearchResultItem({
+    required this.surah,
+    required this.ayah,
+    required this.ayahIndex,
+  });
+}
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -12,137 +25,239 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _controller = TextEditingController();
-  bool _loading = false;
-  String _query = '';
-  List<_ResultItem> _results = [];
+  final TextEditingController _searchController = TextEditingController();
+  List<SearchResultItem> _results = [];
+  bool _isLoading = false;
+  bool _hasSearched = false;
 
-  Future<void> _doSearch(String q) async {
-    setState(() {
-      _loading = true;
-      _query = q;
-    });
-    try {
-      final raw = await QuranService().search(q);
-      final mapped = raw.map((r) => _ResultItem(surah: r.surah, ayah: r.ayah, ayahIndex: r.ayahIndex)).toList();
-      setState(() {
-        _results = mapped;
-      });
-    } catch (e) {
-      // خطای ساده را نمایش می‌دهیم
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطا در جستجو: $e', textDirection: TextDirection.rtl)));
+  Future<void> _performSearch(String query) async {
+    final cleanQuery = query.trim().toLowerCase();
+
+    if (cleanQuery.isEmpty) {
+      if (!mounted) return;
       setState(() {
         _results = [];
+        _hasSearched = false;
+        _isLoading = false;
       });
-    } finally {
+      return;
+    }
+
+    if (mounted) {
       setState(() {
-        _loading = false;
+        _isLoading = true;
+        _hasSearched = true;
       });
+    }
+
+    try {
+      final surahs = await QuranService.instance.loadSurahs();
+      final results = <SearchResultItem>[];
+
+      for (final surah in surahs) {
+        for (var i = 0; i < surah.ayahs.length; i++) {
+          final ayah = surah.ayahs[i];
+
+          final arabicText = ayah.textAr.toLowerCase();
+          final translationText = ayah.textFa.toLowerCase();
+
+          if (arabicText.contains(cleanQuery) ||
+              translationText.contains(cleanQuery)) {
+            results.add(
+              SearchResultItem(
+                surah: surah,
+                ayah: ayah,
+                ayahIndex: i,
+              ),
+            );
+          }
+        }
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _results = results;
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _results = [];
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطا در بارگذاری اطلاعات: $error'),
+        ),
+      );
     }
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Text('برای جستجو متن را وارد کنید', textDirection: TextDirection.rtl, style: const TextStyle(fontSize: 16)),
-    );
+  String _toPersianNumber(dynamic number) {
+    if (number == null) return '';
+    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return number.toString().split('').map((char) {
+      final index = int.tryParse(char);
+      return index != null ? persianDigits[index] : char;
+    }).join('');
   }
 
-  Widget _buildNoResults() {
-    return Center(
-      child: Text('نتیجه‌ای یافت نشد', textDirection: TextDirection.rtl, style: const TextStyle(fontSize: 16)),
-    );
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          child: TextField(
-            controller: _controller,
-            textDirection: TextDirection.rtl,
-            decoration: InputDecoration(
-              hintText: 'متن عربی یا فارسی را جستجو کنید...',
-              prefixIcon: const Icon(Icons.search),
-              border: const OutlineInputBorder(),
-              isDense: true,
-            ),
-            onSubmitted: (v) => _doSearch(v),
-            onChanged: (v) {
-              // جستجوی فوری ساده
-              if (v.trim().isEmpty) {
-                setState(() {
-                  _results = [];
-                  _query = '';
-                });
-                return;
-              }
-              // اجرا کردن جستجو
-              // برای سادگی بدون debounce
-              _doSearch(v);
-            },
+    return Scaffold(
+      backgroundColor: AppColors.bgCream,
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryDark,
+        elevation: 0,
+        title: TextField(
+          controller: _searchController,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white, fontFamily: 'IRANSans'),
+          cursorColor: AppColors.goldAccent,
+          decoration: const InputDecoration(
+            hintText: 'جستجو در متن آیات و ترجمه...',
+            hintStyle: TextStyle(color: Colors.white70, fontFamily: 'IRANSans'),
+            border: InputBorder.none,
           ),
+          onSubmitted: _performSearch,
+          textInputAction: TextInputAction.search,
         ),
-        Expanded(
-          child: _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _query.isEmpty
-                  ? _buildEmptyState()
-                  : _results.isEmpty
-                      ? _buildNoResults()
-                      : ListView.separated(
-                          itemCount: _results.length,
-                          separatorBuilder: (_, __) => const Divider(height: 0),
-                          itemBuilder: (context, index) {
-                            final r = _results[index];
-                            return ListTile(
-                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                              onTap: () {
-                                // باز کردن صفحه سوره و اسکرول به آیه
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (_) => SurahDetailScreen(
-                                    surah: r.surah,
-                                    initialAyahIndex: r.ayahIndex,
-                                  ),
-                                ));
-                              },
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    '${r.surah.name} — آیه ${r.ayah.number}',
-                                    textDirection: TextDirection.rtl,
-                                    style: Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    r.ayah.textAr,
-                                    textDirection: TextDirection.rtl,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    r.ayah.textFa,
-                                    textDirection: TextDirection.rtl,
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                    textAlign: TextAlign.right,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () => _performSearch(_searchController.text),
+          ),
+          if (_searchController.text.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _searchController.clear();
+                _performSearch('');
+              },
+            ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryMedium),
+      )
+          : !_hasSearched
+          ? const Center(
+        child: Text(
+          'کلمه یا عبارت مورد نظر خود را جستجو کنید',
+          style: TextStyle(color: AppColors.textGrey, fontFamily: 'IRANSans'),
         ),
-      ],
+      )
+          : _results.isEmpty
+          ? const Center(
+        child: Text(
+          'نتیجه‌ای یافت نشد',
+          style: TextStyle(color: AppColors.textGrey, fontFamily: 'IRANSans'),
+        ),
+      )
+          : ListView.builder(
+        itemCount: _results.length,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemBuilder: (context, index) {
+          final item = _results[index];
+          final String surahTitle =
+          (item.surah.nameFa != null && item.surah.nameFa!.isNotEmpty)
+              ? item.surah.nameFa!
+              : item.surah.nameAr;
+
+          return Card(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 5,
+            ),
+            color: AppColors.cardBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(
+                color: AppColors.dividerColor,
+                width: 0.8,
+              ),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'سوره $surahTitle - آیه ${_toPersianNumber(item.ayah.number)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppColors.primaryMedium,
+                      fontFamily: 'IRANSans',
+                    ),
+                  ),
+                  Text(
+                    item.surah.nameAr,
+                    style: const TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 16,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      item.ayah.textAr,
+                      textDirection: TextDirection.rtl,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 16,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.ayah.textFa,
+                      textDirection: TextDirection.rtl,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textGrey,
+                        fontFamily: 'IRANSans',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SurahDetailScreen(
+                      surah: item.surah,
+                      initialAyahIndex: item.ayahIndex,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
-}
-
-class _ResultItem {
-  final dynamic surah;
-  final dynamic ayah;
-  final int ayahIndex;
-  _ResultItem({required this.surah, required this.ayah, required this.ayahIndex});
 }

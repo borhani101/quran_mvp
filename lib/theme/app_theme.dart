@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import 'app_colors.dart';
 
 /// Theme Data for Quran MVP Application
 class AppTheme {
@@ -7,7 +7,8 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      
+      fontFamily: 'NotoNaskhArabic', // اعمال فونت پیش‌فرض سراسری
+
       // رنگ اصلی
       primaryColor: AppColors.primaryDark,
       primarySwatch: MaterialColor(
@@ -25,82 +26,92 @@ class AppTheme {
           900: AppColors.primaryLight.withOpacity(0.9),
         },
       ),
-      
+
       // رنگ‌های Scaffold و Background
       scaffoldBackgroundColor: AppColors.bgCream,
       canvasColor: AppColors.bgCream,
-      
+
       // AppBar Theme
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primaryDark,
         foregroundColor: Colors.white,
         elevation: 4,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           color: Colors.white,
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
       ),
-      
+
       // Text Theme
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         displayLarge: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: AppColors.textDark,
         ),
         displayMedium: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: AppColors.textDark,
         ),
         headlineSmall: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.textDark,
         ),
         titleLarge: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.textDark,
         ),
         titleMedium: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.textDark,
         ),
         titleSmall: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.textDark,
         ),
         bodyLarge: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 16,
           fontWeight: FontWeight.w400,
           color: AppColors.textDark,
         ),
         bodyMedium: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: AppColors.textDark,
         ),
         bodySmall: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 12,
           fontWeight: FontWeight.w400,
           color: AppColors.textGrey,
         ),
       ),
-      
+
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.cardBg,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(0),
         ),
       ),
-      
+
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -120,21 +131,22 @@ class AppTheme {
             width: 0,
           ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+          borderSide: BorderSide(
             color: AppColors.primaryDark,
             width: 1,
           ),
         ),
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           color: AppColors.textGrey,
           fontSize: 14,
         ),
         prefixIconColor: AppColors.primaryDark,
         suffixIconColor: AppColors.primaryDark,
       ),
-      
+
       // Button Themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -147,7 +159,7 @@ class AppTheme {
           elevation: 4,
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryDark,
@@ -161,24 +173,22 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // BottomNavigationBar Theme
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textGrey,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
       ),
-      
+
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.dividerColor,
         thickness: 0.5,
         space: 0,
       ),
-      
-      useMaterial3: true,
     );
   }
 }

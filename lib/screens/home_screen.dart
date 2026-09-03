@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'surah_list_screen.dart';
-import 'search_screen.dart';
 import '../theme/app_colors.dart';
+import 'bookmarks_screen.dart';
+import 'search_screen.dart';
+import 'surah_list_screen.dart';
 
-/// صفحه اصلی با نوار پایین (tab-like) دو تب: سوره‌ها و جستجو
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -12,58 +12,58 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  int _currentIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    SurahListScreen(),
-    SearchScreen(),
+  // کلمه const از اول این لیست حذف شد تا خطای کامپایل برطرف شود
+  final List<Widget> _pages = [
+    const SurahListScreen(),
+    const SearchScreen(),
+    const BookmarksScreen(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  final List<String> _titles = const [
+    'سوره‌ها',
+    'جستجو',
+    'نشان‌ها',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'قرآن کریم',
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: 8),
-            // نشان‌های اسلیمی دو طرف
-            const Text('✦', style: TextStyle(color: AppColors.goldAccent, fontSize: 18)),
-            const SizedBox(width: 4),
-            const Text('✦', style: TextStyle(color: AppColors.goldAccent, fontSize: 18)),
-          ],
+        title: Text(
+          _titles[_currentIndex],
+          style: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        elevation: 4,
       ),
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        useLegacyColorScheme: false,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textGrey,
-        items: const <BottomNavigationBarItem>[
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: 'قرآن',
+            icon: Icon(Icons.menu_book_rounded),
+            label: 'سوره‌ها',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
+            icon: Icon(Icons.search_rounded),
+            label: 'جستجو',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_rounded),
             label: 'نشان‌ها',
           ),
         ],

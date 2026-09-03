@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/surah.dart';
+import '../theme/app_colors.dart';
 import '../widgets/ayah_tile.dart';
 
-// صفحه جزئیات سوره — می‌تواند روی آیه مشخصی اسکرول کند
 class SurahDetailScreen extends StatefulWidget {
   final Surah surah;
-  final int? initialAyahIndex; // صفر مبنا
+  final int? initialAyahIndex;
 
-  const SurahDetailScreen({super.key, required this.surah, this.initialAyahIndex});
+  const SurahDetailScreen({
+    super.key,
+    required this.surah,
+    this.initialAyahIndex,
+  });
 
   @override
   State<SurahDetailScreen> createState() => _SurahDetailScreenState();
@@ -20,12 +24,10 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // ایجاد کلید برای هر آیه
     for (var i = 0; i < widget.surah.ayahs.length; i++) {
       _ayahKeys[i] = GlobalKey();
     }
 
-    // بعد از ریندر اولیه، اگر آیتم اولیه خواسته شده است، به آن اسکرول کن
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.initialAyahIndex != null) {
         _scrollToAyah(widget.initialAyahIndex!);
@@ -33,50 +35,43 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> {
     });
   }
 
-  Future<void> _scrollToAyah(int index) async {
+  void _scrollToAyah(int index) {
     final key = _ayahKeys[index];
-    if (key == null) return;
-    final ctx = key.currentContext;
-    if (ctx != null) {
-      await Scrollable.ensureVisible(ctx, alignment: 0.12, duration: const Duration(milliseconds: 300));
-    } else {
-      // fallback: محاسبه حدودی
-      final offset = (index * 120).toDouble();
-      _scrollController.animateTo(offset.clamp(0, _scrollController.position.maxScrollExtent),
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    if (key?.currentContext != null) {
+      Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final surah = widget.surah;
     return Scaffold(
+      backgroundColor: AppColors.bgCream,
       appBar: AppBar(
-        title: Text(
-          '${surah.name} - سوره ${surah.number}',
-          textDirection: TextDirection.rtl,
-        ),
+        title: Text(widget.surah.name),
         centerTitle: true,
       ),
       body: ListView.builder(
         controller: _scrollController,
-        itemCount: surah.ayahs.length,
+        itemCount: widget.surah.ayahs.length,
         itemBuilder: (context, index) {
-          final ayah = surah.ayahs[index];
-          return Container(
+          final ayah = widget.surah.ayahs[index];
+          return AyahTile(
             key: _ayahKeys[index],
-            child: AyahTile(
-              ayah: ayah,
-              onTap: () {
-                // تپ روی آیه = هیچ عملیات پیچیده‌ای لازم نیست، فقط نمایش تَپ کوتاه
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('سوره ${surah.name} — آیه ${ayah.number}', textDirection: TextDirection.rtl),
-                    duration: const Duration(milliseconds: 800),
-                  ),
-                );
-              },
-            ),
+            ayah: ayah,
+            surahNumber: widget.surah.number,
+            surahName: widget.surah.name,
+            ayahIndex: index,
+            isHighlighted: index == widget.initialAyahIndex,
           );
         },
       ),

@@ -11,9 +11,29 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  shared_preferences: ^2.5.3
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/data/quran.json
+    - assets/images/quran_badge.png
+    - assets/images/ornament.png
+
+  fonts:
+    - family: NotoNaskhArabic
+      fonts:
+        - asset: assets/fonts/NotoNaskhArabic-Regular.ttf
+        - asset: assets/fonts/NotoNaskhArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoNaskhArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoNaskhArabic-Bold.ttf
+          weight: 700
+
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700
