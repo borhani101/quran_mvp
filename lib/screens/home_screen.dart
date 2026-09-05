@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'surah_list_screen.dart';
 import 'search_screen.dart';
 import '../theme/app_colors.dart';
@@ -32,19 +33,39 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            /// طرح اسلیمی سمت راست
+            SvgPicture.asset(
+              'lib/assets/ornament_right.svg',
+              width: 24,
+              height: 28,
+              colorFilter: const ColorFilter.mode(
+                AppColors.goldAccent,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 12),
+            
+            /// تایتل اصلی
             const Text(
-              'قرآن کریم',
+              'قرآن طبق تنزیل',
               textDirection: TextDirection.rtl,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 8),
-            // نشان‌های اسلیمی دو طرف
-            const Text('✦', style: TextStyle(color: AppColors.goldAccent, fontSize: 18)),
-            const SizedBox(width: 4),
-            const Text('✦', style: TextStyle(color: AppColors.goldAccent, fontSize: 18)),
+            const SizedBox(width: 12),
+            
+            /// طرح اسلیمی سمت چپ
+            SvgPicture.asset(
+              'lib/assets/ornament_left.svg',
+              width: 24,
+              height: 28,
+              colorFilter: const ColorFilter.mode(
+                AppColors.goldAccent,
+                BlendMode.srcIn,
+              ),
+            ),
           ],
         ),
         centerTitle: true,
