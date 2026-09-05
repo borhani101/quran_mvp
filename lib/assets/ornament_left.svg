@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 60" width="24" height="28">
+  <g fill="none" stroke="#C3A059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- نوک تیز بیرونی (گلبرگ اصلی) -->
+    <path d="M 8 30 Q 18 20 28 30 Q 18 40 8 30 Z" fill="#C3A059" fill-opacity="0.15" />
+    
+    <!-- حلقه‌های دوتایی مرکز -->
+    <circle cx="32" cy="23" r="6" stroke-width="1.8" />
+    <circle cx="32" cy="37" r="6" stroke-width="1.8" />
+    
+    <!-- شاخک‌ها و قوس‌های بالایی و پایینی -->
+    <path d="M 38 17 C 42 10 48 12 48 18" />
+    <path d="M 38 43 C 42 50 48 48 48 42" />
+    
+    <!-- نقطه تزئینی مرکز -->
+    <circle cx="18" cy="30" r="2" fill="#C3A059" />
+  </g>
+</svg>
