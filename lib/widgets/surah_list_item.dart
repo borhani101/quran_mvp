@@ -1,112 +1,113 @@
 import 'package:flutter/material.dart';
 import '../models/surah.dart';
 import '../theme/app_colors.dart';
+import '../utils/persian_number_helper.dart';
 
 class SurahListItem extends StatelessWidget {
   final Surah surah;
   final VoidCallback onTap;
 
   const SurahListItem({
-    super.key,
+    Key? key,
     required this.surah,
     required this.onTap,
-  });
-
-  String _toPersianNumber(dynamic number) {
-    if (number == null) return '';
-    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    return number.toString().split('').map((char) {
-      final index = int.tryParse(char);
-      return index != null ? persianDigits[index] : char;
-    }).join('');
-  }
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bool isMeccan = surah.type.toLowerCase().contains('makki') ||
-        surah.type.contains('مکی');
+    final int count = surah.verseCount > 0 ? surah.verseCount : surah.ayahs.length;
+    final String verseText = '${PersianNumberHelper.toPersian(count)} آیه';
+    final String placeText = surah.revelationPlace;
 
-    final String displayName = (surah.nameFa != null && surah.nameFa!.isNotEmpty)
-        ? surah.nameFa!
-        : surah.nameAr;
-
-    final String juzText = surah.juz != null ? ' • جزء ${_toPersianNumber(surah.juz)}' : '';
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      elevation: 0.5,
-      color: AppColors.cardBg,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.dividerColor, width: 0.8),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              // شماره ترتیب سوره
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: AppColors.bgGrey,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.goldAccent, width: 1.2),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  _toPersianNumber(surah.number),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: AppColors.primaryMedium,
-                    fontFamily: 'IRANSans',
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-
-              // نام سوره و جزئیات
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      displayName,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.goldAccent.withValues(alpha: 0.25),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  // نشان شماره سوره در سمت راست
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.goldAccent.withValues(alpha: 0.6),
+                        width: 1.2,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      PersianNumberHelper.toPersian(surah.number),
                       style: const TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: AppColors.textDark,
-                        fontFamily: 'IRANSans',
+                        fontSize: 14,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${isMeccan ? "مکی" : "مدنی"} • ${_toPersianNumber(surah.verseCount)} آیه$juzText',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textGrey,
-                        fontFamily: 'IRANSans',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                  const SizedBox(width: 14),
 
-              // نام عربی سوره
-              Text(
-                surah.nameAr,
-                style: const TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
+                  // نام سوره و مشخصات
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          surah.name,
+                          style: const TextStyle(
+                            fontFamily: 'Amiri',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$verseText • $placeText',
+                          style: TextStyle(
+                            fontFamily: 'NotoNaskhArabic',
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // آیکون فلش راهنما در سمت چپ
+                  Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 16,
+                    color: AppColors.goldAccent.withValues(alpha: 0.8),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

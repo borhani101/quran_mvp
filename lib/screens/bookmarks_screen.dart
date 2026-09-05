@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-
-import '../models/surah.dart';
 import '../services/bookmark_service.dart';
 import '../services/quran_service.dart';
-import '../theme/app_colors.dart';
-import 'surah_detail_screen.dart';
+import '../models/ayah.dart';
+import '../models/surah.dart';
+import '../widgets/ayah_tile.dart';
 
 class BookmarksScreen extends StatefulWidget {
-  const BookmarksScreen({super.key});
+  const BookmarksScreen({Key? key}) : super(key: key);
 
   @override
   State<BookmarksScreen> createState() => _BookmarksScreenState();
 }
 
 class _BookmarksScreenState extends State<BookmarksScreen> {
-  late Future<List<Bookmark>> _bookmarksFuture;
+  late Future<List<Map<String, dynamic>>> _bookmarksFuture;
 
   @override
   void initState() {
@@ -23,195 +22,107 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   }
 
   void _loadBookmarks() {
-    _bookmarksFuture = BookmarkService.getBookmarks();
+    _bookmarksFuture = _fetchBookmarkedAyahs();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchBookmarkedAyahs() async {
+    final bookmarkKeys = await BookmarkService.getBookmarks();
+    final List<Map<String, dynamic>> results = [];
+    
+    // فراخوانی نمونه به جای دسترسی استاتیک
+    final allSurahs = await QuranService().getSurahs();
+
+    for (var key in bookmarkKeys) {
+      final parts = key.split(':');
+      if (parts.length == 2) {
+        final surahNumber = int.tryParse(parts[0]);
+        final ayahNumber = int.tryParse(parts[1]);
+
+        if (surahNumber != null && ayahNumber != null) {
+          try {
+            final surah = allSurahs.firstWhere((s) => s.number == surahNumber);
+            final ayah = surah.ayahs.firstWhere((a) => a.number == ayahNumber);
+            results.add({'surah': surah, 'ayah': ayah});
+          } catch (_) {}
+        }
+      }
+    }
+    return results;
+  }
+
+  void _removeBookmark(int surahNumber, int ayahNumber) async {
+    await BookmarkService.removeBookmark(surahNumber, ayahNumber);
+    setState(() {
+      _loadBookmarks();
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('از لیست نشانه‌ها حذف شد')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgLight,
-      appBar: AppBar(
-        title: const Text('نشان‌شده‌ها'),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<List<Bookmark>>(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _bookmarksFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
               child: Text(
-                'خطا در بارگذاری نشان‌شده‌ها: ${snapshot.error}',
-                style: const TextStyle(
-                  fontFamily: 'Vazirmatn',
-                ),
+                'هیچ آیه‌ای نشانه‌گذاری نشده است',
+                style: TextStyle(fontSize: 16),
               ),
             );
           }
 
-          final bookmarks = snapshot.data ?? [];
+          final items = snapshot.data!;
 
-          if (bookmarks.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.bookmark_border_rounded,
-                    size: 64,
-                    color: AppColors.textLight.withValues(
-                      alpha: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'هنوز آیه‌ای را نشان نکرده‌اید',
-                    style: TextStyle(
-                      fontFamily: 'Vazirmatn',
-                      fontSize: 16,
-                      color: AppColors.textLight,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            itemCount: bookmarks.length,
-            separatorBuilder: (_, __) =>
-            const SizedBox(height: 12),
+          return ListView.builder(
+            itemCount: items.length,
             itemBuilder: (context, index) {
-              final bookmark = bookmarks[index];
+              final surah = items[index]['surah'] as Surah;
+              final ayah = items[index]['ayah'] as Ayah;
 
               return Dismissible(
-                key: ValueKey(
-                  '${bookmark.surahNumber}_${bookmark.ayahNumber}',
-                ),
+                key: Key('${surah.number}:${ayah.number}'),
                 direction: DismissDirection.endToStart,
-
                 background: Container(
+                  color: Colors.red,
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade400,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
                 ),
-
-                onDismissed: (_) async {
-                  await BookmarkService.removeBookmark(
-                    surahNumber: bookmark.surahNumber,
-                    ayahNumber: bookmark.ayahNumber,
-                  );
-
-                  if (mounted) {
-                    setState(() {
-                      _loadBookmarks();
-                    });
-                  }
+                onDismissed: (_) {
+                  _removeBookmark(surah.number, ayah.number);
                 },
-
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(
-                          alpha: 0.04,
-                        ),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding:
-                    const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-
-                    title: Text(
-                      'سوره ${bookmark.surahName} - آیه ${bookmark.ayahNumber}',
-                      textDirection: TextDirection.rtl,
-                      style: const TextStyle(
-                        fontFamily: 'Vazirmatn',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-
-                    subtitle: bookmark.ayahText.isNotEmpty
-                        ? Padding(
-                      padding: const EdgeInsets.only(
-                        top: 6,
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Text(
-                        bookmark.ayahText,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 16,
-                          color:
-                          AppColors.primaryMedium,
+                        'سوره ${surah.name}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
-                    )
-                        : null,
-
-                    trailing: const Icon(
-                      Icons.chevron_left,
-                      color: AppColors.textLight,
                     ),
-
-                    onTap: () async {
-                      final Surah? surah =
-                      await QuranService()
-                          .getSurahByNumber(
-                        bookmark.surahNumber,
-                      );
-
-                      if (surah != null &&
-                          context.mounted) {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                SurahDetailScreen(
-                                  surah: surah,
-                                  initialAyahIndex:
-                                  bookmark.ayahNumber - 1,
-                                ),
-                          ),
-                        );
-
-                        if (mounted) {
-                          setState(() {
-                            _loadBookmarks();
-                          });
-                        }
-                      }
-                    },
-                  ),
+                    AyahTile(
+                      ayah: ayah,
+                      surahNumber: surah.number,
+                      surahName: surah.name,
+                      isBookmarked: true,
+                      onBookmarkToggle: () => _removeBookmark(surah.number, ayah.number),
+                    ),
+                    const Divider(),
+                  ],
                 ),
               );
             },

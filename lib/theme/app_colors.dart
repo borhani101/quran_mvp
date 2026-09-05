@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
 
-/// رنگ‌های تم اپلیکیشن قرآن MVP
-/// App Colors - Design Tokens for Quran MVP
+/// رنگ‌های تم اپلیکیشن قرآن
 class AppColors {
-  // رنگ‌های اصلی (Primary Colors)
-  static const Color primaryDark = Color(0xFF1F4E3D); // سبز یشمی تیره
-  static const Color primaryMedium = Color(0xFF2A6B57); // سبز متوسط
-  static const Color primaryLight = Color(0xFF3D8B71); // سبز روشن
+  // --- توکن‌های طراحی جدید (Minimal Green & Cream) ---
+  static const Color background = Color(0xFFF9F7F1); // پس‌زمینه کرم روشن
+  static const Color cardBackground = Color(0xFFFAF7F2); // پس‌زمینه کارت‌ها
+  static const Color primaryGreen = Color(0xFF1B3B2B); // سبز تیره سنتی
+  static const Color goldAccent = Color(0xFFC29B38); // طلایی ظریف
+  static const Color searchBarBg = Color(0xFFF0ECE1); // پس‌زمینه سرچ‌بار
+  static const Color borderLight = Color(0xFFE5DFC9); // بوردر و حاشیه‌ها
+  static const Color textDark = Color(0xFF1B3B2B); // متن اصلی
+  static const Color textMuted = Color(0xFF8C827A); // متن ثانویه و کم‌رنگ
+  static const Color bottomBarBg = Color(0xFFF5F2EA); // پس‌زمینه نوار پایین
 
-  // رنگ‌های پس‌زمینه (Background Colors)
-  static const Color bgCream = Color(0xFFFBF8F0); // کرم ملایم (شبیه کاغذ قرآنی)
-  static const Color bgLight = Color(0xFFFFFAF5); // سفید ملایم
-  static const Color bgGrey = Color(0xFFF5F3EF); // خاکستری روشن
+  // --- حفظ متغیرهای قبلی برای سازگاری با سایر ویجت‌ها ---
+  static const Color primaryDark = Color(0xFF1B3B2B);
+  static const Color primaryMedium = Color(0xFF2A523E);
+  static const Color primaryLight = Color(0xFF3D6B53);
 
-  // رنگ‌های تاکیدی (Accent Colors)
-  static const Color goldAccent = Color(0xFFD4AF7C); // طلایی ملایم
-  static const Color goldDark = Color(0xFFC19A4A); // طلایی تیره
+  static const Color bgCream = Color(0xFFF9F7F1);
+  static const Color bgLight = Color(0xFFFAF7F2);
+  static const Color bgGrey = Color(0xFFF0ECE1);
 
-  // رنگ‌های متن (Text Colors)
-  static const Color textDark = Color(0xFF2C3E50); // متن تیره
-  static const Color textGrey = Color(0xFF7F8C8D); // متن خاکستری
-  static const Color textLight = Color(0xFFBDC3C7); // متن روشن
+  static const Color goldDark = Color(0xFFA88428);
+  static const Color textGrey = Color(0xFF8C827A);
+  static const Color textLight = Color(0xFFB5ADA4);
 
-  // رنگ‌های حالت (Status Colors)
-  static const Color cardBg = Color(0xFFFFFDFA); // رنگ کارت‌ها
-  static const Color dividerColor = Color(0xFFE8DDD0); // خطوط جداکننده
-  static const Color shadowColor = Color(0xFF000000); // رنگ سایه
+  static const Color cardBg = Color(0xFFFAF7F2);
+  static const Color dividerColor = Color(0xFFE5DFC9);
+  static const Color shadowColor = Color(0x08000000);
 
-  // رنگ‌های سوره‌های مختلف
-  static const Color surahMakki = Color(0xFF1F4E3D); // مکی
-  static const Color surahMadani = Color(0xFF8B5A3C); // مدنی
+  static const Color surahMakki = Color(0xFF1B3B2B);
+  static const Color surahMadani = Color(0xFF8C827A);
 }
 
-/// الأنماط والتدرجات (Gradients)
+/// گرادیان‌ها (Gradients)
 class AppGradients {
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
@@ -53,17 +55,17 @@ class AppGradients {
   );
 }
 
-/// الظلال (Shadows)
+/// سایه‌ها (Shadows)
 class AppShadows {
   static const BoxShadow lightShadow = BoxShadow(
-    color: AppColors.shadowColor,
+    color: Color(0x0A000000),
     blurRadius: 6.0,
     offset: Offset(0, 2),
     spreadRadius: 0,
   );
 
   static const BoxShadow mediumShadow = BoxShadow(
-    color: AppColors.shadowColor,
+    color: Color(0x12000000),
     blurRadius: 12.0,
     offset: Offset(0, 4),
     spreadRadius: 0,
@@ -71,7 +73,7 @@ class AppShadows {
 
   static List<BoxShadow> cardShadows = [
     const BoxShadow(
-      color: Color(0x1A000000), // ملایم و شفاف
+      color: Color(0x0A000000),
       blurRadius: 8.0,
       offset: Offset(0, 2),
       spreadRadius: 0,

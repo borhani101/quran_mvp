@@ -72,7 +72,7 @@ class SurahCard extends StatelessWidget {
                   gradient: AppGradients.accentGradient,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.goldDark.withOpacity(0.3),
+                      color: AppColors.goldDark.withValues(alpha:0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

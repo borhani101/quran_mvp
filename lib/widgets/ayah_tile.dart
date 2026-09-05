@@ -1,189 +1,131 @@
 import 'package:flutter/material.dart';
-
 import '../models/ayah.dart';
 import '../services/bookmark_service.dart';
-import '../theme/app_colors.dart';
 
 class AyahTile extends StatefulWidget {
-final Ayah ayah;
-final int surahNumber;
-final String surahName;
-final int ayahIndex;
-final bool isHighlighted;
+  final Ayah ayah;
+  final int? surahNumber;
+  final String? surahName;
+  final int? ayahIndex;
+  final bool isHighlighted;
+  final bool isBookmarked;
+  final VoidCallback? onBookmarkToggle;
 
-const AyahTile({
-super.key,
-required this.ayah,
-required this.surahNumber,
-required this.surahName,
-required this.ayahIndex,
-this.isHighlighted = false,
-});
+  const AyahTile({
+    Key? key,
+    required this.ayah,
+    this.surahNumber,
+    this.surahName,
+    this.ayahIndex,
+    this.isHighlighted = false,
+    this.isBookmarked = false,
+    this.onBookmarkToggle,
+  }) : super(key: key);
 
-@override
-State<AyahTile> createState() => _AyahTileState();
+  @override
+  State<AyahTile> createState() => _AyahTileState();
 }
 
 class _AyahTileState extends State<AyahTile> {
-bool _isBookmarked = false;
+  late bool _isBookmarked;
 
-@override
-void initState() {
-super.initState();
-_checkBookmarkStatus();
-}
+  int? get _effectiveSurahNumber {
+    if (widget.surahNumber != null) return widget.surahNumber;
+    try {
+      final map = widget.ayah.toJson();
+      return map['surahNumber'] ?? map['surah_number'] ?? map['surahId'];
+    } catch (_) {
+      return null;
+    }
+  }
 
-Future<void> _checkBookmarkStatus() async {
-final result = await BookmarkService.isBookmarked(
-surahNumber: widget.surahNumber,
-ayahNumber: widget.ayah.number,
-);
+  @override
+  void initState() {
+    super.initState();
+    _isBookmarked = widget.isBookmarked;
+    _checkBookmark();
+  }
 
-if (mounted) {
-setState(() {
-_isBookmarked = result;
-});
-}
-}
+  void _checkBookmark() async {
+    final sNum = _effectiveSurahNumber;
+    final aNum = widget.ayah.number;
+    if (sNum != null) {
+      final marked = await BookmarkService.isBookmarked(sNum, aNum);
+      if (mounted) setState(() => _isBookmarked = marked);
+    }
+  }
 
-Future<void> _toggleBookmark() async {
-if (_isBookmarked) {
-await BookmarkService.removeBookmark(
-surahNumber: widget.surahNumber,
-ayahNumber: widget.ayah.number,
-);
-} else {
-await BookmarkService.addBookmark(
-Bookmark(
-surahNumber: widget.surahNumber,
-surahName: widget.surahName,
-ayahNumber: widget.ayah.number,
-ayahText: widget.ayah.textAr,
-),
-);
-}
+  void _toggleBookmark() async {
+    final sNum = _effectiveSurahNumber;
+    final aNum = widget.ayah.number;
 
-if (mounted) {
-setState(() {
-_isBookmarked = !_isBookmarked;
-});
-}
-}
+    if (widget.onBookmarkToggle != null) {
+      widget.onBookmarkToggle!();
+    } else if (sNum != null) {
+      if (_isBookmarked) {
+        await BookmarkService.removeBookmark(sNum, aNum);
+      } else {
+        await BookmarkService.addBookmark(sNum, aNum);
+      }
+      setState(() => _isBookmarked = !_isBookmarked);
+    }
+  }
 
-String _toPersianNumber(int num) {
-const map = {
-'0': '۰',
-'1': '۱',
-'2': '۲',
-'3': '۳',
-'4': '۴',
-'5': '۵',
-'6': '۶',
-'7': '۷',
-'8': '۸',
-'9': '۹',
-};
+  // استخراج ایمن متون آیه بدون روبرو شدن با NoSuchMethodError
+  Map<String, String?> _extractTexts() {
+    String arabic = '';
+    String? translation;
 
-return num
-    .toString()
-    .split('')
-    .map((c) => map[c] ?? c)
-    .join();
-}
+    try {
+      // تبدیل مدل به Map جهت بررسی ایمن کلیدها
+      final Map<String, dynamic> map = widget.ayah.toJson();
+      
+      arabic = (map['text'] ?? 
+                map['arabic'] ?? 
+                map['arabicText'] ?? 
+                map['content'] ?? 
+                'آیه ${widget.ayah.number}').toString();
 
-@override
-Widget build(BuildContext context) {
-return Container(
-margin: const EdgeInsets.symmetric(
-horizontal: 16,
-vertical: 8,
-),
-padding: const EdgeInsets.all(16),
-decoration: BoxDecoration(
-color: widget.isHighlighted
-? AppColors.goldAccent.withOpacity(0.15)
-    : AppColors.cardBg,
-borderRadius: BorderRadius.circular(16),
-border: Border.all(
-color: widget.isHighlighted
-? AppColors.goldAccent
-    : AppColors.dividerColor.withOpacity(0.5),
-),
-boxShadow: [
-BoxShadow(
-color: AppColors.shadowColor.withOpacity(0.04),
-blurRadius: 10,
-offset: const Offset(0, 4),
-),
-],
-),
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.stretch,
-children: [
-Row(
-textDirection: TextDirection.rtl,
-children: [
-Container(
-width: 36,
-height: 36,
-decoration: BoxDecoration(
-shape: BoxShape.circle,
-color: AppColors.goldAccent.withOpacity(0.2),
-),
-child: Center(
-child: Text(
-_toPersianNumber(widget.ayah.number),
-style: const TextStyle(
-color: AppColors.primaryDark,
-fontWeight: FontWeight.bold,
-),
-),
-),
-),
+      translation = map['translation']?.toString() ?? 
+                    map['persianText']?.toString() ?? 
+                    map['farsi']?.toString() ?? 
+                    map['persian']?.toString();
+    } catch (_) {
+      arabic = 'آیه ${widget.ayah.number}';
+    }
 
-const Spacer(),
+    return {'arabic': arabic, 'translation': translation};
+  }
 
-IconButton(
-icon: Icon(
-_isBookmarked
-? Icons.bookmark_rounded
-    : Icons.bookmark_border_rounded,
-color: _isBookmarked
-? AppColors.goldDark
-    : AppColors.textGrey,
-),
-onPressed: _toggleBookmark,
-),
-],
-),
+  @override
+  Widget build(BuildContext context) {
+    final texts = _extractTexts();
+    final String arabicText = texts['arabic'] ?? '';
+    final String? translationText = texts['translation'];
 
-const SizedBox(height: 12),
-
-Text(
-widget.ayah.textAr,
-textDirection: TextDirection.rtl,
-textAlign: TextAlign.right,
-style: const TextStyle(
-fontSize: 22,
-height: 2.0,
-color: AppColors.primaryDark,
-),
-),
-
-const SizedBox(height: 8),
-
-Text(
-widget.ayah.textFa,
-textDirection: TextDirection.rtl,
-textAlign: TextAlign.right,
-style: const TextStyle(
-fontSize: 14,
-height: 1.8,
-color: AppColors.textDark,
-),
-),
-],
-),
-);
-}
+    return Container(
+      color: widget.isHighlighted ? Theme.of(context).primaryColor.withOpacity(0.15) : null,
+      child: ListTile(
+        title: Text(
+          arabicText,
+          textAlign: TextAlign.right,
+          style: const TextStyle(fontFamily: 'Amiri', fontSize: 18, color: Colors.black),
+        ),
+        subtitle: (translationText != null && translationText.isNotEmpty)
+            ? Text(
+                translationText,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              )
+            : null,
+        trailing: IconButton(
+          icon: Icon(
+            _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+            color: _isBookmarked ? Theme.of(context).primaryColor : Colors.grey,
+          ),
+          onPressed: _toggleBookmark,
+        ),
+      ),
+    );
+  }
 }

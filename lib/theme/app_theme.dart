@@ -14,16 +14,16 @@ class AppTheme {
       primarySwatch: MaterialColor(
         AppColors.primaryDark.value,
         {
-          50: AppColors.primaryDark.withOpacity(0.1),
-          100: AppColors.primaryDark.withOpacity(0.2),
-          200: AppColors.primaryDark.withOpacity(0.3),
-          300: AppColors.primaryDark.withOpacity(0.4),
-          400: AppColors.primaryDark.withOpacity(0.5),
+          50: AppColors.primaryDark.withValues(alpha:0.1),
+          100: AppColors.primaryDark.withValues(alpha:0.2),
+          200: AppColors.primaryDark.withValues(alpha:0.3),
+          300: AppColors.primaryDark.withValues(alpha:0.4),
+          400: AppColors.primaryDark.withValues(alpha:0.5),
           500: AppColors.primaryDark,
           600: AppColors.primaryMedium,
           700: AppColors.primaryLight,
-          800: AppColors.primaryLight.withOpacity(0.8),
-          900: AppColors.primaryLight.withOpacity(0.9),
+          800: AppColors.primaryLight.withValues(alpha:0.8),
+          900: AppColors.primaryLight.withValues(alpha:0.9),
         },
       ),
 

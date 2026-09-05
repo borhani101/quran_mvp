@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/surah.dart';
 import '../services/quran_service.dart';
+import '../theme/app_colors.dart';
 import '../widgets/surah_list_item.dart';
 import 'surah_detail_screen.dart';
 
 class SurahListScreen extends StatefulWidget {
-  const SurahListScreen({super.key});
+  const SurahListScreen({Key? key}) : super(key: key);
 
   @override
   State<SurahListScreen> createState() => _SurahListScreenState();
@@ -13,88 +14,73 @@ class SurahListScreen extends StatefulWidget {
 
 class _SurahListScreenState extends State<SurahListScreen> {
   late Future<List<Surah>> _surahsFuture;
-  final TextEditingController _searchController = TextEditingController();
   List<Surah> _allSurahs = [];
   List<Surah> _filteredSurahs = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // اصلاح متد فراخوانی سرویس
     _surahsFuture = QuranService.instance.loadSurahs();
   }
 
   void _filterSurahs(String query) {
+    if (query.trim().isEmpty) {
+      setState(() => _filteredSurahs = _allSurahs);
+      return;
+    }
     setState(() {
-      final cleanQuery = query.trim().toLowerCase();
-      if (cleanQuery.isEmpty) {
-        _filteredSurahs = _allSurahs;
-      } else {
-        _filteredSurahs = _allSurahs.where((surah) {
-          final nameMatch = surah.name.toLowerCase().contains(cleanQuery);
-          final nameArMatch = surah.nameAr.toLowerCase().contains(cleanQuery);
-          final nameFaMatch = surah.nameFa != null &&
-              surah.nameFa!.toLowerCase().contains(cleanQuery);
-          final infoMatch = surah.displayInfo.toLowerCase().contains(cleanQuery);
-
-          return nameMatch || nameArMatch || nameFaMatch || infoMatch;
-        }).toList();
-      }
+      _filteredSurahs = _allSurahs.where((s) {
+        final q = query.trim().toLowerCase();
+        return s.name.toLowerCase().contains(q) ||
+            s.number.toString().contains(q);
+      }).toList();
     });
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const Color creamBackground = Color(0xFFFBF8F1);
-    const Color goldColor = Color(0xFFC7A265);
-    const Color primaryGreen = Color(0xFF1E3A2F);
-
-    return Container(
-      color: creamBackground,
-      child: FutureBuilder<List<Surah>>(
-        future: _surahsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'خطا در بارگذاری داده‌ها: ${snapshot.error}',
-                textDirection: TextDirection.rtl,
-              ),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(color: goldColor),
-            );
-          }
-
-          _allSurahs = snapshot.data!;
-          if (_filteredSurahs.isEmpty && _searchController.text.isEmpty) {
-            _filteredSurahs = _allSurahs;
-          }
-
-          if (_allSurahs.isEmpty) {
-            return const Center(
-              child: Text(
-                'هیچ سوره‌ای پیدا نشد.',
-                textDirection: TextDirection.rtl,
-              ),
-            );
-          }
-
-          return Column(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: AppColors.bgCream,
+        body: SafeArea(
+          child: Column(
             children: [
+              const SizedBox(height: 12),
+              // هدر بسم الله
+              const Center(
+                child: Text(
+                  'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
               // نوار جستجو
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
-                  height: 48,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: AppColors.goldAccent.withValues(alpha: 0.3),
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -103,77 +89,113 @@ class _SurahListScreenState extends State<SurahListScreen> {
                   child: TextField(
                     controller: _searchController,
                     onChanged: _filterSurahs,
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 14,
+                    ),
                     decoration: InputDecoration(
-                      hintText: 'جستجو در نام سوره‌ها...',
+                      hintText: 'جستجوی سوره...',
                       hintStyle: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
+                        fontSize: 13,
                         color: Colors.grey.shade400,
-                        fontSize: 14,
                       ),
                       prefixIcon: const Icon(
                         Icons.search,
-                        color: Colors.grey,
-                        size: 22,
+                        color: AppColors.primaryGreen,
+                        size: 20,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
               ),
 
-              // سربرگ «سوره‌ها»
+              const SizedBox(height: 14),
+
+              // جداکننده عنوان سوره‌ها
               Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 6),
-                child: Column(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
                   children: [
+                    Container(
+                      width: 4,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: AppColors.goldAccent,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     const Text(
                       'سوره‌ها',
                       style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: primaryGreen,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 48,
-                      height: 2.5,
-                      decoration: BoxDecoration(
-                        color: goldColor,
-                        borderRadius: BorderRadius.circular(2),
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
 
               // لیست سوره‌ها
               Expanded(
-                child: _filteredSurahs.isEmpty
-                    ? Center(
-                  child: Text(
-                    'نتیجه‌ای یافت نشد',
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                )
-                    : ListView.builder(
-                  padding: const EdgeInsets.only(top: 6, bottom: 16),
-                  itemCount: _filteredSurahs.length,
-                  itemBuilder: (context, index) {
-                    final surah = _filteredSurahs[index];
-                    return SurahListItem(
-                      surah: surah,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => SurahDetailScreen(surah: surah),
-                          ),
+                child: FutureBuilder<List<Surah>>(
+                  future: _surahsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryGreen,
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'خطا در بارگذاری اطلاعات: ${snapshot.error}',
+                          style: const TextStyle(fontFamily: 'NotoNaskhArabic'),
+                        ),
+                      );
+                    }
+
+                    if (_allSurahs.isEmpty && snapshot.hasData) {
+                      _allSurahs = snapshot.data!;
+                      if (_searchController.text.isEmpty) {
+                        _filteredSurahs = _allSurahs;
+                      }
+                    }
+
+                    if (_filteredSurahs.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'موردی یافت نشد',
+                          style: TextStyle(fontFamily: 'NotoNaskhArabic'),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: _filteredSurahs.length,
+                      padding: const EdgeInsets.only(bottom: 24),
+                      itemBuilder: (context, index) {
+                        final surah = _filteredSurahs[index];
+                        return SurahListItem(
+                          surah: surah,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SurahDetailScreen(surah: surah),
+                              ),
+                            );
+                          },
                         );
                       },
                     );
@@ -181,15 +203,9 @@ class _SurahListScreenState extends State<SurahListScreen> {
                 ),
               ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }
