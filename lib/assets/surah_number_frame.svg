@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <style>
+      .frame-gold { stroke: #C3A059; fill: none; }
+      .frame-fill { fill: #C3A059; opacity: 0.15; }
+    </style>
+  </defs>
+  
+  <!-- دایره خارجی اصلی -->
+  <circle cx="50" cy="50" r="48" class="frame-gold" stroke-width="2.5"/>
+  
+  <!-- طرح‌های زخرفی فلورال دقیق -->
+  <g class="frame-gold" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- بالا -->
+    <path d="M 50 8 Q 58 12 62 20 Q 58 16 50 14 Q 42 16 38 20 Q 42 12 50 8"/>
+    <path d="M 50 8 L 50 20"/>
+    
+    <!-- راست -->
+    <path d="M 92 50 Q 88 58 80 62 Q 84 58 86 50 Q 84 42 80 38 Q 88 42 92 50"/>
+    <path d="M 92 50 L 80 50"/>
+    
+    <!-- پایین -->
+    <path d="M 50 92 Q 42 88 38 80 Q 42 84 50 86 Q 58 84 62 80 Q 58 88 50 92"/>
+    <path d="M 50 92 L 50 80"/>
+    
+    <!-- چپ -->
+    <path d="M 8 50 Q 12 42 20 38 Q 16 42 14 50 Q 16 58 20 62 Q 12 58 8 50"/>
+    <path d="M 8 50 L 20 50"/>
+    
+    <!-- گوشه‌های چهار طرف -->
+    <circle cx="70" cy="30" r="3" class="frame-fill"/>
+    <circle cx="70" cy="70" r="3" class="frame-fill"/>
+    <circle cx="30" cy="30" r="3" class="frame-fill"/>
+    <circle cx="30" cy="70" r="3" class="frame-fill"/>
+  </g>
+  
+  <!-- دایره درونی -->
+  <circle cx="50" cy="50" r="38" class="frame-gold" stroke-width="1"/>
+  
+  <!-- نقاط تزئینی مرکزی -->
+  <circle cx="50" cy="15" r="1.5" fill="#C3A059"/>
+  <circle cx="85" cy="50" r="1.5" fill="#C3A059"/>
+  <circle cx="50" cy="85" r="1.5" fill="#C3A059"/>
+  <circle cx="15" cy="50" r="1.5" fill="#C3A059"/>
+</svg>
