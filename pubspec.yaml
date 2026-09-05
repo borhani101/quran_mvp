@@ -11,9 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  flutter_svg: ^2.0.0
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/data/quran.json
+    - lib/assets/ornament_left.svg
+    - lib/assets/ornament_right.svg
+    - lib/assets/surah_frame.svg
