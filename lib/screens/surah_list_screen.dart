@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/surah.dart';
 import '../services/quran_service.dart';
 import '../widgets/surah_list_item.dart';
@@ -71,7 +72,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
 
         return Column(
           children: [
-            // Search Bar
+            /// نوار جستجو
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: SearchBarWidget(
@@ -81,12 +82,22 @@ class _SurahListScreenState extends State<SurahListScreen> {
               ),
             ),
 
-            // Section Header "سوره‌ها"
+            /// عنوان بخش "سوره‌ها" با طرح اسلیمی
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  /// طرح چپ
+                  SvgPicture.asset(
+                    'lib/assets/ornament_left.svg',
+                    width: 20,
+                    height: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  
+                  /// متن عنوان
                   Text(
                     'سوره‌ها',
                     textDirection: TextDirection.rtl,
@@ -94,11 +105,19 @@ class _SurahListScreenState extends State<SurahListScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                   ),
+                  const SizedBox(width: 12),
+                  
+                  /// طرح راست
+                  SvgPicture.asset(
+                    'lib/assets/ornament_right.svg',
+                    width: 20,
+                    height: 24,
+                  ),
                 ],
               ),
             ),
 
-            // Surah List - استفاده از SurahListItem
+            /// لیست سوره‌ها
             Expanded(
               child: _filteredSurahs.isEmpty
                   ? Center(
