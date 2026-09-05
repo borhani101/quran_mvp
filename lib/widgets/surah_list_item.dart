@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/surah.dart';
 import '../theme/app_colors.dart';
 
@@ -50,49 +51,39 @@ class SurahListItem extends StatelessWidget {
         child: Row(
           textDirection: TextDirection.rtl,
           children: [
-            // سمت راست: شماره سوره در کادر اسلیمی
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
+            /// شماره سوره با فریم اسلیمی
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SvgPicture.asset(
+                  'lib/assets/surah_number_frame.svg',
+                  width: 56,
+                  height: 56,
+                  colorFilter: const ColorFilter.mode(
                     AppColors.goldAccent,
-                    AppColors.goldDark,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.goldDark.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    BlendMode.srcIn,
                   ),
-                ],
-              ),
-              child: Center(
-                child: Text(
+                ),
+                Text(
                   persianNumber,
                   textDirection: TextDirection.rtl,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                    color: AppColors.textDark,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+              ],
             ),
             const SizedBox(width: 16),
 
-            // وسط: نام سوره و اطلاعات
+            /// نام سوره و اطلاعات
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // نام سوره
+                  /// نام سوره
                   Text(
                     surah.name,
                     textDirection: TextDirection.rtl,
@@ -104,7 +95,7 @@ class SurahListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
-                  // نوع و تعداد آیات
+                  /// نوع و تعداد آیات
                   Text(
                     surah.displayInfo,
                     textDirection: TextDirection.rtl,
@@ -118,7 +109,7 @@ class SurahListItem extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // سمت چپ: شماره ترتیب (English digits)
+            /// شماره ترتیب
             Text(
               '$index',
               textDirection: TextDirection.ltr,
