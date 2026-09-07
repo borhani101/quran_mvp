@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/quran_service.dart';
-import '../widgets/ayah_tile.dart';
 import 'surah_detail_screen.dart';
 
 // صفحه جستجو
@@ -59,29 +58,34 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          child: TextField(
-            controller: _controller,
+          child: Directionality(
             textDirection: TextDirection.rtl,
-            decoration: InputDecoration(
-              hintText: 'متن عربی یا فارسی را جستجو کنید...',
-              prefixIcon: const Icon(Icons.search),
-              border: const OutlineInputBorder(),
-              isDense: true,
+            child: TextField(
+              controller: _controller,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+              decoration: InputDecoration(
+                hintText: 'متن عربی یا فارسی را جستجو کنید...',
+                hintTextDirection: TextDirection.rtl,
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+              onSubmitted: (v) => _doSearch(v),
+              onChanged: (v) {
+                // جستجوی فوری ساده
+                if (v.trim().isEmpty) {
+                  setState(() {
+                    _results = [];
+                    _query = '';
+                  });
+                  return;
+                }
+                // اجرا کردن جستجو
+                // برای سادگی بدون debounce
+                _doSearch(v);
+              },
             ),
-            onSubmitted: (v) => _doSearch(v),
-            onChanged: (v) {
-              // جستجوی فوری ساده
-              if (v.trim().isEmpty) {
-                setState(() {
-                  _results = [];
-                  _query = '';
-                });
-                return;
-              }
-              // اجرا کردن جستجو
-              // برای سادگی بدون debounce
-              _doSearch(v);
-            },
           ),
         ),
         Expanded(

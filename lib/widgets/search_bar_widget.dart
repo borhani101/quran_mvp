@@ -34,48 +34,53 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: TextField(
-        controller: controller,
-        readOnly: readOnly,
+      child: Directionality(
         textDirection: TextDirection.rtl,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: AppColors.textGrey,
+        child: TextField(
+          controller: controller,
+          readOnly: readOnly,
+          textAlign: TextAlign.right,
+          textDirection: TextDirection.rtl,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintTextDirection: TextDirection.rtl,
+            hintStyle: TextStyle(
+              color: AppColors.textGrey,
+              fontSize: 14,
+            ),
+            prefixIcon: GestureDetector(
+              onTap: onSearchPressed,
+              child: const Icon(
+                Icons.search,
+                color: AppColors.primaryDark,
+                size: 22,
+              ),
+            ),
+            suffixIcon: controller?.text.isNotEmpty == true
+                ? GestureDetector(
+                    onTap: () {
+                      controller?.clear();
+                      onChanged?.call('');
+                    },
+                    child: const Icon(
+                      Icons.close,
+                      color: AppColors.textGrey,
+                      size: 20,
+                    ),
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+            isDense: true,
+          ),
+          style: TextStyle(
+            color: AppColors.textDark,
             fontSize: 14,
           ),
-          prefixIcon: GestureDetector(
-            onTap: onSearchPressed,
-            child: const Icon(
-              Icons.search,
-              color: AppColors.primaryDark,
-              size: 22,
-            ),
-          ),
-          suffixIcon: controller?.text.isNotEmpty == true
-              ? GestureDetector(
-                  onTap: () {
-                    controller?.clear();
-                    onChanged?.call('');
-                  },
-                  child: const Icon(
-                    Icons.close,
-                    color: AppColors.textGrey,
-                    size: 20,
-                  ),
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          isDense: true,
-        ),
-        style: TextStyle(
-          color: AppColors.textDark,
-          fontSize: 14,
         ),
       ),
     );

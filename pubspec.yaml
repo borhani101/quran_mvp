@@ -21,3 +21,6 @@ flutter:
     - lib/assets/ornament_left.svg
     - lib/assets/ornament_right.svg
     - lib/assets/surah_frame.svg
+    - lib/assets/surah_number_frame.svg
+    - lib/assets/title_ornament.svg
+    - lib/assets/numberSvg.png
