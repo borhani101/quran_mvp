@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'surah_list_screen.dart';
@@ -33,14 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// طرح اسلیمی سمت راست
-            SvgPicture.asset(
-              'lib/assets/ornament_right.svg',
-              width: 24,
-              height: 28,
-              colorFilter: const ColorFilter.mode(
-                AppColors.goldAccent,
-                BlendMode.srcIn,
+            Transform.rotate(
+              angle: math.pi,
+              child: SvgPicture.asset(
+                'lib/assets/title_ornament.svg',
+                width: 24,
+                height: 28,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.goldAccent,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -56,14 +60,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 12),
             
-            /// طرح اسلیمی سمت چپ
-            SvgPicture.asset(
-              'lib/assets/ornament_left.svg',
-              width: 24,
-              height: 28,
-              colorFilter: const ColorFilter.mode(
-                AppColors.goldAccent,
-                BlendMode.srcIn,
+            Transform.rotate(
+              angle: math.pi,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.diagonal3Values(-1, 1, 1),
+                child: SvgPicture.asset(
+                  'lib/assets/title_ornament.svg',
+                  width: 24,
+                  height: 28,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.goldAccent,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ),
           ],

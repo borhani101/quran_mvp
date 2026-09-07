@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../models/surah.dart';
 import '../theme/app_colors.dart';
 
@@ -39,6 +38,10 @@ class SurahListItem extends StatelessWidget {
     return result;
   }
 
+  String _displayInfoInPersian() {
+    return '${surah.revelationPlace} · ${_toPersianNumber(surah.verseCount)} آیه';
+  }
+
   @override
   Widget build(BuildContext context) {
     final persianNumber = _toPersianNumber(surah.number);
@@ -46,8 +49,20 @@ class SurahListItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        color: AppColors.bgCream,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        height: 78,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.dividerColor),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
         child: Row(
           textDirection: TextDirection.rtl,
           children: [
@@ -55,27 +70,27 @@ class SurahListItem extends StatelessWidget {
             Stack(
               alignment: Alignment.center,
               children: [
-                SvgPicture.asset(
-                  'lib/assets/surah_number_frame.svg',
-                  width: 56,
-                  height: 56,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.goldAccent,
-                    BlendMode.srcIn,
-                  ),
+                Image.asset(
+                  'lib/assets/numberSvg.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
                 ),
-                Text(
-                  persianNumber,
-                  textDirection: TextDirection.rtl,
-                  style: const TextStyle(
-                    color: AppColors.textDark,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Transform.translate(
+                  offset: const Offset(-2, 0),
+                  child: Text(
+                    persianNumber,
+                    textDirection: TextDirection.rtl,
+                    style: const TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
 
             /// نام سوره و اطلاعات
             Expanded(
@@ -97,7 +112,7 @@ class SurahListItem extends StatelessWidget {
                   const SizedBox(height: 2),
                   /// نوع و تعداد آیات
                   Text(
-                    surah.displayInfo,
+                    _displayInfoInPersian(),
                     textDirection: TextDirection.rtl,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textGrey,
@@ -105,18 +120,6 @@ class SurahListItem extends StatelessWidget {
                         ),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            /// شماره ترتیب
-            Text(
-              '$index',
-              textDirection: TextDirection.ltr,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textGrey,
               ),
             ),
           ],

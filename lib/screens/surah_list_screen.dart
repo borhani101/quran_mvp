@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../models/surah.dart';
 import '../services/quran_service.dart';
 import '../widgets/surah_list_item.dart';
 import '../widgets/search_bar_widget.dart';
+import '../theme/app_colors.dart';
 import 'surah_detail_screen.dart';
 
 class SurahListScreen extends StatefulWidget {
@@ -82,22 +82,10 @@ class _SurahListScreenState extends State<SurahListScreen> {
               ),
             ),
 
-            /// عنوان بخش "سوره‌ها" با طرح اسلیمی
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.only(top: 4, bottom: 12),
+              child: Column(
                 children: [
-                  /// طرح چپ
-                  SvgPicture.asset(
-                    'lib/assets/ornament_left.svg',
-                    width: 20,
-                    height: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  
-                  /// متن عنوان
                   Text(
                     'سوره‌ها',
                     textDirection: TextDirection.rtl,
@@ -105,13 +93,14 @@ class _SurahListScreenState extends State<SurahListScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                   ),
-                  const SizedBox(width: 12),
-                  
-                  /// طرح راست
-                  SvgPicture.asset(
-                    'lib/assets/ornament_right.svg',
-                    width: 20,
-                    height: 24,
+                  const SizedBox(height: 6),
+                  Container(
+                    width: 156,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
                 ],
               ),
@@ -128,14 +117,12 @@ class _SurahListScreenState extends State<SurahListScreen> {
                       ),
                     )
                   : ListView.separated(
-                      padding: EdgeInsets.zero,
-                      itemCount: _filteredSurahs.length,
-                      separatorBuilder: (_, __) => const Divider(
-                        height: 1,
-                        thickness: 0.5,
-                        indent: 0,
-                        endIndent: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
                       ),
+                      itemCount: _filteredSurahs.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final surah = _filteredSurahs[index];
                         return SurahListItem(
